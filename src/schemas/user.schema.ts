@@ -5,7 +5,7 @@ import { TransactionItem, TransactionItemSchema } from './transactionItem.schema
 
 export type UserDocument = User & Document;
 
-type UserData = {
+export type UserData = {
   email: string;
   password: string;
 }
@@ -13,17 +13,18 @@ type UserData = {
 
 @Schema()
 export class User {
-  @Prop()
+
+  @Prop({ type: {} as UserData })
   data: UserData;
 
-  @Prop()
+  @Prop({ type: Number, default: 0})
   invested: number;
 
-  @Prop({ type: TransactionItemSchema })
-  transactions: TransactionItem[];
+  @Prop({ type: [TransactionItemSchema], default: [] })
+  transactions: [TransactionItem];
 
-  @Prop({ type: HistoryItemSchema })
-  history: HistoryItem[];
+  @Prop({ type: [HistoryItemSchema], default: [] })
+  history: [HistoryItem];
 
   @Prop({ default: null })
   currentToken: string | null;

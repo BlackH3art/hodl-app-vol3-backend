@@ -8,4 +8,15 @@ export interface UserInterface {
   transactions: TransactionInterface[];
   history: HistoryItemInterface[];
   currentToken: string | null;
+} 
+
+export interface UserRegisterInterface {
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface UserLoginInterface {
+  email: string;
+  password: string;
 }
