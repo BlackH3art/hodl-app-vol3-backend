@@ -47,10 +47,7 @@ export class AuthService {
       
     } catch (error) {
       console.log(error.message);
-      console.log('generate wywala');
-      
     }
-
 
     return token;
   }
@@ -65,12 +62,9 @@ export class AuthService {
         "data.password": hashPassword(loginData.password)
       });
 
-
       if(!user) return res.status(404).json({ msg: "Invalid login or password" });
 
       const token = await this.createToken( await this.generateToken(user));
-      console.log('mam token? ', token);
-            
 
       return res.status(200).cookie('jwt', token.accessToken, {
         secure: false, //true jeżeli https
@@ -80,8 +74,7 @@ export class AuthService {
       
     } catch (error) {
       console.log(error.message);
-      console.log(error);
-      // res.status(500).json({ msg: "Server error" })
+      res.status(500).json({ msg: "Server error" })
     }
   }
 }
