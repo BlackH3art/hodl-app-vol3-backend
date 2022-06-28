@@ -24,6 +24,9 @@ export class User {
 
   @Prop({ type: HistoryItemSchema })
   history: HistoryItem[];
+
+  @Prop({ default: null })
+  currentToken: string | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
