@@ -22,22 +22,22 @@ export class UserService {
       const passwordHash = hashPassword(newUser.password);
       const confirmPasswordHash = hashPassword(newUser.confirmPassword);
       
-      if(login) return res.status(400).json({ msg: "Account already exists" });
-      if(passwordHash !== confirmPasswordHash) return res.status(400).json({ msg: "Passwords are not the same" });
+      if(login) return res.status(400).json({ ok: false, msg: "Account already exists" });
+      if(passwordHash !== confirmPasswordHash) return res.status(400).json({ ok: false, msg: "Passwords are not the same" });
 
-      const user = await this.userModel.create({
+      await this.userModel.create({
         data: {
           email: newUser.email,
           password: passwordHash
         }
       });
 
-      return res.status(201).json(user);
+      return res.status(201).json({ ok: true, msg: "User registered" });
 
     } catch (error) {
 
       console.log('Error signUp', error.message);
-      res.status(500).json({ msg: "Something went wrong"});
+      res.status(500).json({ ok: false, msg: "Something went wrong"});
     }
   }
 

@@ -66,13 +66,18 @@ export class AuthService {
 
       const token = await this.createToken( await this.generateToken(user));
 
+      const authUser = await this.userModel.findOne({
+        "data.email": loginData.email,
+        "data.password": hashPassword(loginData.password)
+      });
+
       const userResponse: UserResponseInterface = {
-        email: user.data.email,
-        invested: user.invested,
-        transactions: user.transactions,
-        history: user.history,
-        currentToken: user.currentToken,
-        terms: user.terms
+        email: authUser.data.email,
+        invested: authUser.invested,
+        transactions: authUser.transactions,
+        history: authUser.history,
+        currentToken: authUser.currentToken,
+        terms: authUser.terms
       }
 
       return res.status(200).cookie('jwt', token.accessToken, {
