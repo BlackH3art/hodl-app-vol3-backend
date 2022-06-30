@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/schemas/user.schema';
 
-import { UserLoginInterface } from 'src/interfaces/UserInterface';
+import { UserLoginInterface, UserResponseInterface } from 'src/interfaces/UserInterface';
 import { JwtPayload } from './jwt.strategy';
 
 import { hashPassword } from 'src/utils/hashPassword';
@@ -66,11 +66,20 @@ export class AuthService {
 
       const token = await this.createToken( await this.generateToken(user));
 
+      const userResponse: UserResponseInterface = {
+        email: user.data.email,
+        invested: user.invested,
+        transactions: user.transactions,
+        history: user.history,
+        currentToken: user.currentToken,
+        terms: user.terms
+      }
+
       return res.status(200).cookie('jwt', token.accessToken, {
         secure: false, //true jeżeli https
         domain: 'localhost', //domena
         httpOnly: true
-      }).json({ ok: true });
+      }).json(userResponse);
       
     } catch (error) {
       console.log(error.message);

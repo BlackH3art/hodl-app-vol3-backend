@@ -28,6 +28,9 @@ export class User {
 
   @Prop({ default: null })
   currentToken: string | null;
+
+  @Prop({ type: Boolean, default: false })
+  terms: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
