@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { FetchCmcModule } from './fetch-cmc/fetch-cmc.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TransactionModule } from './transaction/transaction.module';
     AuthModule,
     UserModule,
     TransactionModule,
+    FetchCmcModule,
   ],
   controllers: [AppController],
   providers: [AppService],
