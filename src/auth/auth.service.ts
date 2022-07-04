@@ -80,11 +80,9 @@ export class AuthService {
         terms: authUser.terms
       }
 
-      return res.status(200).cookie('jwt', token.accessToken, {
-        secure: false, //true jeżeli https
-        domain: 'localhost', //domena
-        httpOnly: true
-      }).json(userResponse);
+      res.status(200).cookie('jwt', token.accessToken);
+
+      return res.json(userResponse);
       
     } catch (error) {
       console.log(error.message);

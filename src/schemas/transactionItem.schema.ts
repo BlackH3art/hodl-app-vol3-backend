@@ -18,7 +18,7 @@ export class TransactionItem {
   @Prop()
   entryPrice: number;
 
-  @Prop({ type: Date })
+  @Prop({ type: Date, default: new Date() })
   openDate: Date;
 
   @Prop()

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { FetchCmcModule } from 'src/fetch-cmc/fetch-cmc.module';
 import { HistoryItem, HistoryItemSchema } from 'src/schemas/historyItem.schema';
 import { TransactionItem, TransactionItemSchema } from 'src/schemas/transactionItem.schema';
 import { User, UserSchema } from 'src/schemas/user.schema';
@@ -8,6 +9,7 @@ import { TransactionService } from './transaction.service';
 
 @Module({
   imports: [
+    FetchCmcModule,
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: TransactionItem.name, schema: TransactionItemSchema },
