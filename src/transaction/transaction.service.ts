@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Request, Response } from 'express';
+import { Types } from 'mongoose';
+import { Response } from 'express';
 import { Model } from 'mongoose';
 import { FetchCmcService } from 'src/fetch-cmc/fetch-cmc.service';
 import { TransactionBodyInterface } from 'src/interfaces/TransactionInterface';
-import { HistoryItem } from 'src/schemas/historyItem.schema';
-import { TransactionItem } from 'src/schemas/transactionItem.schema';
-import { User } from 'src/schemas/user.schema';
+import { HistoryDocument, HistoryItem } from 'src/schemas/historyItem.schema';
+import { TransactionDocument, TransactionItem } from 'src/schemas/transactionItem.schema';
+import { User, UserDocument } from 'src/schemas/user.schema';
 
 @Injectable()
 export class TransactionService {
@@ -19,23 +20,75 @@ export class TransactionService {
   ) {}
 
 
-  async add(transactionBody: TransactionBodyInterface, req: Request, res: Response) {
+  async add(transactionBody: TransactionBodyInterface, res: Response, user: UserDocument) {
 
-    console.log('transaction --> ', transactionBody);
     
     try {
 
+      if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
+
+      const authUser: UserDocument = await this.userModel.findById(user._id);
+
       const coinDetails = await this.fetchCmcService.getCoinData(transactionBody.ticker.toUpperCase());
-
-      // jeśli nie ma coina wyśłij res i nic nie dodawaj.
       if(!coinDetails) return res.status(404).json({ ok: false, msg: "No such coin"});
+      
+      const { ticker, price, quantity, type, date } = transactionBody;
 
-      const newTransaction = {
-        ...transactionBody,
-        historyItemID: ''
+      switch (type) {
+        case "buy":
+        
+          const buyHistoryItem = {
+            ticker: ticker,
+            type: type,
+            entryPrice: price,
+            sellingPrice: null,
+            quantity: quantity,
+            sellingQuantity: null,
+            openDate: date,
+            closeDate: null,
+            gain: null,
+            invested: quantity * price
+          }
+          
+          const newBuyHistoryItem = await this.historyModel.create(buyHistoryItem);
+
+          const buyTransaction = {
+            ticker: ticker,
+            type: type,
+            quantity: quantity,
+            entryPrice: price,
+            openDate: date,
+            open: true,
+            historyItemID: newBuyHistoryItem._id
+          }
+          const newBuyTransaction = await this.transactionModel.create(buyTransaction)
+
+          authUser.transactions.push(newBuyTransaction);
+          authUser.history.push(newBuyHistoryItem);
+
+          await authUser.save();
+
+          res.status(200).json({ ok: true, msg: "Created transaction and history item"});
+          break;
+
+
+
+        case "sell":
+
+          
+
+          break;
+
+        default:
+          break;
       }
+
+
       
     } catch (error) {
+      console.log(error.message);
+      console.log(error);
+      
       
     }
     

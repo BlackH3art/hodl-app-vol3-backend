@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Date, Document } from 'mongoose';
+import { Document } from 'mongoose';
 
 export type TransactionDocument = TransactionItem & Document;
 
 
 @Schema()
-export class TransactionItem {
+export class TransactionItem extends Document {
   @Prop()
   ticker: string;
 
@@ -23,6 +23,9 @@ export class TransactionItem {
 
   @Prop()
   historyItemID: string;
+
+  @Prop({ type: Boolean})
+  open: boolean;
 }
 
 export const TransactionItemSchema = SchemaFactory.createForClass(TransactionItem);

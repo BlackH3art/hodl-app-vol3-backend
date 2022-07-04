@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Date, Document } from 'mongoose';
+import { Document } from 'mongoose';
 
 export type HistoryDocument = HistoryItem & Document;
 
 
 @Schema()
-export class HistoryItem {
+export class HistoryItem extends Document {
   @Prop()
   ticker: string;
 
@@ -13,7 +13,7 @@ export class HistoryItem {
   type: "buy" | "sell";
 
   @Prop()
-  sellingPrice: number;
+  sellingPrice: number | null;
 
   @Prop()
   entryPrice: number;
@@ -22,7 +22,7 @@ export class HistoryItem {
   quantity: number;
 
   @Prop()
-  sellingQuantity: number;
+  sellingQuantity: number | null;
 
   @Prop()
   invested: number;

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { HistoryItem, HistoryItemSchema } from './historyItem.schema';
-import { TransactionItem, TransactionItemSchema } from './transactionItem.schema';
+import { HistoryDocument, HistoryItem, HistoryItemSchema } from './historyItem.schema';
+import { TransactionDocument, TransactionItem, TransactionItemSchema } from './transactionItem.schema';
 
 export type UserDocument = User & Document;
 
@@ -21,10 +21,10 @@ export class User {
   invested: number;
 
   @Prop({ type: [TransactionItemSchema], default: [] })
-  transactions: [TransactionItem];
+  transactions: [TransactionDocument];
 
   @Prop({ type: [HistoryItemSchema], default: [] })
-  history: [HistoryItem];
+  history: [HistoryDocument];
 
   @Prop({ default: null })
   currentToken: string | null;
