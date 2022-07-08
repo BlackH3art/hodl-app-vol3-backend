@@ -219,4 +219,32 @@ export class TransactionService {
 
     return res.end();
   }
+
+
+  async delete(id: string, res: Response, user: UserDocument) {
+
+    try {
+
+      if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
+      if(!Types.ObjectId.isValid(id)) return res.status(400).json({ ok: false, msg: "Incorrect transaction ID" });
+
+      const authUser: UserDocument = await this.userModel.findById(user._id);
+
+      const transactionToDelete = authUser.transactions.id(id);
+      if(!transactionToDelete) return res.status(404).json({ ok: false, msg: "Transaction not found"})
+      
+
+      await authUser.history.id(transactionToDelete.historyItemID).remove();
+      await transactionToDelete.remove();
+      await authUser.save();
+
+      res.status(200).json({ ok: true, msg: "Transaction deleted"});
+
+      
+    } catch (error) {
+      console.log('Error deleting');
+      console.log(error.message);
+      res.status(500).json({ ok: false, msg: "Something went wrong"})
+    }
+  }
 }

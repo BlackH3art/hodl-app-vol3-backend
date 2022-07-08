@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Inject, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { UserDecorator } from 'src/decorators/user.decorator';
@@ -24,4 +24,13 @@ export class TransactionController {
     return this.transactionService.add(transactionBody, res, user);
   }
 
+  @Delete('delete/:id')
+  @UseGuards(AuthGuard('jwt'))
+  deleteTransaction(
+    @Param('id') id: string,
+    @UserDecorator() user: UserDocument,
+    @Res() res: Response,
+  ): Promise<any> {
+    return this.transactionService.delete(id, res, user);
+  }
 }
