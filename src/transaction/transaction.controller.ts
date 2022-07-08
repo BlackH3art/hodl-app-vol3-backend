@@ -1,9 +1,9 @@
-import { Body, Controller, Delete, Inject, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Inject, Param, Patch, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { UserDecorator } from 'src/decorators/user.decorator';
 import { TransactionBodyInterface } from 'src/interfaces/TransactionInterface';
-import { User, UserDocument } from 'src/schemas/user.schema';
+import { UserDocument } from 'src/schemas/user.schema';
 import { TransactionService } from './transaction.service';
 
 @Controller('transaction')
@@ -32,5 +32,16 @@ export class TransactionController {
     @Res() res: Response,
   ): Promise<any> {
     return this.transactionService.delete(id, res, user);
+  }
+
+  @Patch('edit/:id')
+  @UseGuards(AuthGuard('jwt'))
+  editTransaction(
+    @Param('id') id: string,
+    @Body() transactionBody: TransactionBodyInterface,
+    @UserDecorator() user: UserDocument,
+    @Res() res: Response
+  ): Promise<any> {
+    return this.transactionService.edit(transactionBody, id, res, user);
   }
 }

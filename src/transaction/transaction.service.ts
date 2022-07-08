@@ -247,4 +247,50 @@ export class TransactionService {
       res.status(500).json({ ok: false, msg: "Something went wrong"})
     }
   }
+
+
+  async edit(transactionBody: TransactionBodyInterface, id: string, res: Response, user: UserDocument) {
+    
+    try {
+
+      const { ticker, type, quantity, price, date } = transactionBody;
+      
+      
+      if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
+      if(!Types.ObjectId.isValid(id)) return res.status(400).json({ ok: false, msg: "Incorrect transaction ID" });
+
+      const authUser: UserDocument = await this.userModel.findById(user._id);
+
+      const transactionToEdit = authUser.transactions.id(id);
+      const historyItemToEdit = authUser.history.id(transactionToEdit.historyItemID);
+
+      transactionToEdit.set({
+        ...transactionToEdit,
+        ticker: ticker,
+        type: type,
+        quantity: quantity,
+        entryPrice: price,
+        openDate: date,
+      });
+
+      historyItemToEdit.set({
+        ...historyItemToEdit,
+        ticker: ticker,
+        type: type,
+        quantity: quantity,
+        entryPrice: price,
+        openDate: date,
+      });
+
+      await authUser.save();
+
+
+      res.status(200).json({ ok: true, msg: "Transaction updated"});
+      
+    } catch (error) {
+      console.log('Error editing');
+      console.log(error.message);
+      res.status(500).json({ ok: false, msg: "Something went wrong"})
+    }
+  }
 }
