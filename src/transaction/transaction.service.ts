@@ -293,4 +293,41 @@ export class TransactionService {
       res.status(500).json({ ok: false, msg: "Something went wrong"})
     }
   }
+
+
+  async average(res: Response, user: UserDocument) {
+
+    try {
+
+      if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
+
+      const averageTransactions = await this.userModel.aggregate([
+        {
+          $match: { _id: user._id }
+        },
+        {
+          $unwind: "$transactions"
+        },
+        {
+          $group: {
+            _id: "$transactions.ticker",
+            averagePrice: {
+              $avg: "$transactions.entryPrice"
+            },
+            quantitySum: {
+              $sum: "$transactions.quantity"
+            }
+          }
+        }
+      ]);
+
+
+      res.status(200).json(averageTransactions);
+      
+    } catch (error) {
+      console.log("error average transactions");
+      console.log(error.message);
+      res.status(500).json({ ok: false, msg: "Something went wrong"});
+    }
+  }
 }

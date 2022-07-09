@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Inject, Param, Patch, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, Patch, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { UserDecorator } from 'src/decorators/user.decorator';
@@ -13,6 +13,15 @@ export class TransactionController {
     @Inject(TransactionService) private transactionService: TransactionService,
   ) {}
 
+  @Get('average')
+  @UseGuards(AuthGuard('jwt'))
+  getAverage(
+    @UserDecorator() user: UserDocument,
+    @Res() res: Response
+  ): Promise<any> {
+    return this.transactionService.average(res, user);
+  }
+
   @Post('add')
   @UseGuards(AuthGuard('jwt'))
   addTransaction(
@@ -20,7 +29,6 @@ export class TransactionController {
     @UserDecorator() user: UserDocument,
     @Res() res: Response
   ): Promise<any> {
-
     return this.transactionService.add(transactionBody, res, user);
   }
 
