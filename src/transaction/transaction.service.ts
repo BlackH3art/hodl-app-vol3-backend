@@ -29,7 +29,7 @@ export class TransactionService {
 
       const authUser: UserDocument = await this.userModel.findById(user._id);
 
-      const coinDetails = await this.fetchCmcService.getCoinData(transactionBody.ticker.toUpperCase());
+      const coinDetails = await this.fetchCmcService.getSingleCoinData(transactionBody.ticker.toUpperCase());
       if(!coinDetails) return res.status(404).json({ ok: false, msg: "No such coin"});
       
       const { ticker, price, quantity, type, date } = transactionBody;
