@@ -303,19 +303,28 @@ export class TransactionService {
 
       const averageTransactions = await this.userModel.aggregate([
         {
-          $match: { _id: user._id }
-        },
+          $match: {
+            _id: user._id
+          }
+        }, 
         {
-          $unwind: "$transactions"
-        },
+          $unwind: {
+            path: '$transactions'
+          }
+        }, 
+        {
+          $match: {
+            'transactions.open': true
+          }
+        }, 
         {
           $group: {
-            _id: "$transactions.ticker",
+            _id: '$transactions.ticker', 
             averagePrice: {
-              $avg: "$transactions.entryPrice"
-            },
+              $avg: '$transactions.entryPrice'
+            }, 
             quantitySum: {
-              $sum: "$transactions.quantity"
+              $sum: '$transactions.quantity'
             }
           }
         }
@@ -326,6 +335,40 @@ export class TransactionService {
       
     } catch (error) {
       console.log("error average transactions");
+      console.log(error.message);
+      res.status(500).json({ ok: false, msg: "Something went wrong"});
+    }
+  }
+
+
+  async all(res: Response, user: UserDocument) {
+
+    try {
+      if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
+  
+      const authUser: UserDocument = await this.userModel.findById(user._id);
+
+      res.status(200).json(authUser.transactions);
+      
+    } catch (error) {
+      console.log("error getting transactions");
+      console.log(error.message);
+      res.status(500).json({ ok: false, msg: "Something went wrong"});
+    }
+
+  }
+
+
+  async history(res: Response, user: UserDocument) {
+    try {
+      if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
+  
+      const authUser: UserDocument = await this.userModel.findById(user._id);
+
+      res.status(200).json(authUser.history);
+      
+    } catch (error) {
+      console.log("error getting hisotry");
       console.log(error.message);
       res.status(500).json({ ok: false, msg: "Something went wrong"});
     }

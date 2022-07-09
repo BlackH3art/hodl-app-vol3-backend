@@ -13,6 +13,15 @@ export class TransactionController {
     @Inject(TransactionService) private transactionService: TransactionService,
   ) {}
 
+  @Get('all')
+  @UseGuards(AuthGuard('jwt'))
+  getTransactions(
+    @UserDecorator() user: UserDocument,
+    @Res() res: Response
+  ): Promise<any> {
+    return this.transactionService.all(res, user);
+  }
+
   @Get('average')
   @UseGuards(AuthGuard('jwt'))
   getAverage(
@@ -20,6 +29,15 @@ export class TransactionController {
     @Res() res: Response
   ): Promise<any> {
     return this.transactionService.average(res, user);
+  }
+
+  @Get('history')
+  @UseGuards(AuthGuard('jwt'))
+  getHistory(
+    @UserDecorator() user: UserDocument,
+    @Res() res: Response
+  ): Promise<any> {
+    return this.transactionService.history(res, user);
   }
 
   @Post('add')
