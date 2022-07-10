@@ -28,9 +28,6 @@ export class TransactionService {
       if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
 
       const authUser: UserDocument = await this.userModel.findById(user._id);
-
-      const coinDetails = await this.fetchCmcService.getSingleCoinData(transactionBody.ticker.toUpperCase());
-      if(!coinDetails) return res.status(404).json({ ok: false, msg: "No such coin"});
       
       const { ticker, price, quantity, type, date } = transactionBody;
 

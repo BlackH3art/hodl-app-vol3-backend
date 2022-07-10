@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Inject, Param, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { UserDecorator } from 'src/decorators/user.decorator';
@@ -13,15 +13,19 @@ export class FetchCmcController {
   ) {}
 
 
-  @Get('/coin/data')
-  getCoinData(): Promise<any> {
-    return this.fetchCmc.getSingleCoinData('SOL');
+  @Get('/coin/:ticker')
+  @UseGuards(AuthGuard('jwt'))
+  singleCoinData(
+    @Param('ticker') ticker: string,
+    @Res() res: Response
+  ): Promise<any> {
+    return this.fetchCmc.getSingleCoinData(res, ticker);
   }
 
 
   @Get('coins')
   @UseGuards(AuthGuard('jwt'))
-  getCoinsDetails(
+  manyCoinsData(
     @UserDecorator() user: UserDocument,
     @Res() res: Response
   ): Promise<any> {

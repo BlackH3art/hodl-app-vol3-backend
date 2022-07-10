@@ -4,7 +4,7 @@ import { Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
 import { Model } from 'mongoose';
-import { CoinDetailsItem } from 'src/schemas/coinDetailsItem';
+import { CoinDetailsDocument, CoinDetailsItem } from 'src/schemas/coinDetailsItem';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import { baseUrl } from 'src/utils/constants';
 import { CoinDataInterface } from 'src/interfaces/CoinDataInterface';
@@ -32,31 +32,67 @@ export class FetchCmcService {
   
 
   // fetch only single coin data
-  async getSingleCoinData(ticker: string): Promise<CoinDetailsItem | boolean> {
+  async getSingleCoinData(res: Response, tickerParam: string): Promise<any> {
+
+    const ticker = tickerParam.toUpperCase();
     
     try {
 
-      const coinFromDB = await this.coinDetailsModel.findOne({ symbol: ticker });
+      const coinFromDB: CoinDetailsDocument = await this.coinDetailsModel.findOne({ symbol: ticker });
 
       if(coinFromDB) {
-        return coinFromDB;
+
+        const { data: prices } = await this.httpService.axiosRef.get(`${baseUrl}/cryptocurrency/quotes/latest`, this.createRequestObject(ticker));
+
+
+        const { name, symbol, logo } = coinFromDB;
+        const { price: currentPrice, "percent_change_1h": change1h, "percent_change_24h": change24h, "percent_change_7d": change7d} = prices.data[ticker].quote.USD;
+
+        const coinData: CoinDataInterface = {
+          name,
+          ticker: symbol,
+          logo,
+          currentPrice,
+          change1h,
+          change24h,
+          change7d,
+        }
+
+        return res.status(200).json(coinData);
+
       } else {
 
-        const { data } = await this.httpService.axiosRef.get(`${baseUrl}/cryptocurrency/info`, this.createRequestObject(ticker));
+        const { data: details } = await this.httpService.axiosRef.get(`${baseUrl}/cryptocurrency/info`, this.createRequestObject(ticker));
+        const { data: prices } = await this.httpService.axiosRef.get(`${baseUrl}/cryptocurrency/quotes/latest`, this.createRequestObject(ticker));
+
         
-        const { name, symbol, logo } = data.data[ticker];
+        const { name, symbol, logo } = details.data[ticker];
+        const { price: currentPrice, "percent_change_1h": change1h, "percent_change_24h": change24h, "percent_change_7d": change7d} = prices.data[ticker].quote.USD;
+
         const newCoinDetailsItem: CoinDetailsItem = {
           name,
           symbol,
           logo,
         }
+        await this.coinDetailsModel.create(newCoinDetailsItem);
 
-        return await this.coinDetailsModel.create(newCoinDetailsItem);
+        const coinData: CoinDataInterface = {
+          name,
+          ticker: symbol,
+          logo,
+          currentPrice,
+          change1h,
+          change24h,
+          change7d,
+        }
+
+        return res.status(200).json(coinData);
       }
       
     } catch (error) {
-      // throw new BadRequestException(error, "There's no such coin.");
-      return false;
+      console.log("error fetching single coin");
+      console.log(error.message);
+      res.status(500).json({ ok: false, msg: "Something went wrong"});
     }
     
   }
