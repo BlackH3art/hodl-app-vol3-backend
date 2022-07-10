@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User } from 'src/schemas/user.schema';
+import { Model, Types } from 'mongoose';
+import { User, UserDocument } from 'src/schemas/user.schema';
 
 import { UserLoginInterface, UserResponseInterface } from 'src/interfaces/UserInterface';
 import { JwtPayload } from './jwt.strategy';
@@ -74,10 +74,7 @@ export class AuthService {
       const userResponse: UserResponseInterface = {
         email: authUser.data.email,
         invested: authUser.invested,
-        transactions: authUser.transactions,
-        history: authUser.history,
         currentToken: authUser.currentToken,
-        terms: authUser.terms
       }
 
       res.status(200).cookie('jwt', token.accessToken);
@@ -87,6 +84,30 @@ export class AuthService {
     } catch (error) {
       console.log(error.message);
       res.status(500).json({ msg: "Server error" })
+    }
+  }
+
+
+  async loggedIn(res: Response, user: UserDocument) {
+
+    try {
+      
+      if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
+      const authUser: UserDocument = await this.userModel.findById(user._id);
+
+      const userResponse: UserResponseInterface = {
+        email: authUser.data.email,
+        invested: authUser.invested,
+        currentToken: authUser.currentToken,
+      }
+
+      res.status(200).json(userResponse);
+
+    } catch (error) {
+      console.log('Error checking if user is logged in');
+      console.log(error.message);
+      console.log(error);
+      res.status(500).json({ ok: false, msg: error.message});
     }
   }
 }

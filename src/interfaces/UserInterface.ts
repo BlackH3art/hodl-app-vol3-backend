@@ -15,10 +15,7 @@ export interface UserInterface {
 export interface UserResponseInterface {
   email: string;
   invested: number;
-  transactions: TransactionItem[];
-  history: HistoryItem[];
   currentToken: string | null;
-  terms: boolean;
 } 
 
 export interface UserRegisterInterface {
