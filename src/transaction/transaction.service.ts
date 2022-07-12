@@ -110,6 +110,9 @@ export class TransactionService {
             
             const transaction = sortedTransactions[iterator];
             console.log('transaction -->', transaction);
+            if(!transaction) {
+              break;
+            }
 
             // finde the transaction to sell from user document
             const transactionToUpdate = authUser.transactions.id(transaction._id);
@@ -435,6 +438,69 @@ export class TransactionService {
       
     } catch (error) {
       console.log("error getting hisotry");
+      console.log(error.message);
+      res.status(500).json({ ok: false, msg: "Something went wrong"});
+    }
+  }
+
+
+  async transactionMaxAmount(res: Response, user: UserDocument, id: string) {
+    try {
+
+      if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
+  
+      const authUser: UserDocument = await this.userModel.findById(user._id);
+
+      const transactionToSell = authUser.transactions.id(id);
+
+      res.status(200).json({ ok: true, msg: "Transaction max amount", data: { maxAmount: transactionToSell.quantity} });
+      
+    } catch (error) {
+      console.log("error transaction max amount");
+      console.log(error.message);
+      res.status(500).json({ ok: false, msg: "Something went wrong"});
+    }
+  }
+
+
+  async tickerMaxAmount(res: Response, user: UserDocument, ticker: string) {
+    try {
+
+      if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
+  
+      const tickerMaxAmount = await this.userModel.aggregate([
+        {
+          $match: {
+            _id: user._id
+          }
+        }, 
+        {
+          $unwind: {
+            path: '$transactions'
+          }
+        }, 
+        {
+          $match: {
+            'transactions.open': true,
+            'transactions.ticker': ticker
+          }
+        }, 
+        {
+          $group: {
+            _id: '$transactions.ticker', 
+            maxAmount: {
+              $sum: '$transactions.quantity'
+            }
+          }
+        }
+      ]);
+
+
+      res.status(200).json({ ok: true, msg: "Ticker max amount", data: tickerMaxAmount})
+
+      
+    } catch (error) {
+      console.log("error ticker max amount");
       console.log(error.message);
       res.status(500).json({ ok: false, msg: "Something went wrong"});
     }

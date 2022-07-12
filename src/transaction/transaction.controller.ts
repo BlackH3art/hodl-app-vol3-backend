@@ -40,6 +40,27 @@ export class TransactionController {
     return this.transactionService.history(res, user);
   }
 
+  @Get('max/id/:id')
+  @UseGuards(AuthGuard('jwt'))
+  getTransactionMaxAmount(
+    @Param('id') id: string,
+    @UserDecorator() user: UserDocument,
+    @Res() res: Response,
+  ): Promise<any> {
+    return this.transactionService.transactionMaxAmount(res, user, id);
+  }
+
+  @Get('max/ticker/:ticker')
+  @UseGuards(AuthGuard('jwt'))
+  getTickerMaxAmount(
+    @Param('ticker') ticker: string,
+    @UserDecorator() user: UserDocument,
+    @Res() res: Response,
+  ): Promise<any> {
+    return this.transactionService.tickerMaxAmount(res, user, ticker);
+  }
+
+
   @Post('add')
   @UseGuards(AuthGuard('jwt'))
   addTransaction(
