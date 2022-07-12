@@ -30,5 +30,14 @@ export class AuthController {
   ): Promise<any> {
     return this.authService.loggedIn(res, user);
   }
+
+  @Get('/logout')
+  @UseGuards(AuthGuard('jwt'))
+  logout(
+    @Res() res: Response,
+    @UserDecorator() user: UserDocument,
+  ): Promise<any> {
+    return this.authService.logout(res, user);
+  }
   
 }

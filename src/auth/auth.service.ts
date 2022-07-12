@@ -77,7 +77,11 @@ export class AuthService {
         currentToken: authUser.currentToken,
       }
 
-      res.status(200).cookie('jwt', token.accessToken);
+      res.status(200).cookie('jwt', token.accessToken, {
+        secure: false,
+        domain: "localhost",
+        httpOnly: true,
+      });
 
       return res.json(userResponse);
       
@@ -110,4 +114,32 @@ export class AuthService {
       res.status(500).json({ ok: false, msg: error.message});
     }
   }
+
+
+  async logout(res: Response, user: UserDocument) {
+
+    try {
+
+      if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
+      const authUser: UserDocument = await this.userModel.findById(user._id);
+
+      authUser.currentToken = null;
+      await authUser.save();
+
+      res.clearCookie('jwt', {
+        secure: false,
+        domain: "localhost",
+        httpOnly: true,
+      });
+
+      res.status(200).json({ ok: true, msg: "User logged out" });
+      
+    } catch (error) {
+      console.log('Error logging out');
+      console.log(error.message);
+      console.log(error);
+      res.status(500).json({ ok: false, msg: error.message});
+    }
+  }
+
 }
