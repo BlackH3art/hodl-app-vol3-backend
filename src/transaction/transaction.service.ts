@@ -307,15 +307,10 @@ export class TransactionService {
       const transactionToSell = authUser.transactions.id(id);
 
 
-      if(ticker !== transactionToSell.ticker) res.status(200).json({ ok: false, msg: "Cannot sell different coin" });
-      if(type !== "sell") res.status(200).json({ ok: false, msg: "Incorrect type for selling" });
-      if(quantity > transactionToSell.quantity) res.status(200).json({ ok: false, msg: "Cannot sell more than position amount" });
+      if(ticker !== transactionToSell.ticker) return res.status(200).json({ ok: false, msg: "Cannot sell different coin" });
+      if(type !== "sell") return res.status(200).json({ ok: false, msg: "Incorrect type for selling" });
+      if(quantity > transactionToSell.quantity) return res.status(200).json({ ok: false, msg: "Cannot sell more than position amount" });
 
-
-
-      // two scenarios
-      // 1. sellingQuantity is part of quantity
-      // 2. sellingQuantity is equal to quantity
 
       if(transactionToSell.quantity - quantity !== 0) {
 
@@ -332,10 +327,6 @@ export class TransactionService {
           open: false,
         });
       }
-
-
-      // transaction edited
-      // create history item based on transaction
 
 
       const sellHistoryItem = {
