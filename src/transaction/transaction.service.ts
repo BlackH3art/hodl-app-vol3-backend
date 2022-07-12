@@ -292,6 +292,84 @@ export class TransactionService {
   }
 
 
+  async sell(transactionBody: TransactionBodyInterface, id: string, res: Response, user: UserDocument) {
+
+    try {
+
+      const { ticker, type, quantity, price, date } = transactionBody;
+      
+      
+      if(!Types.ObjectId.isValid(user._id)) return res.status(400).json({ ok: false, msg: "Incorrect user ID" });
+      if(!Types.ObjectId.isValid(id)) return res.status(400).json({ ok: false, msg: "Incorrect transaction ID" });
+
+      const authUser: UserDocument = await this.userModel.findById(user._id);
+
+      const transactionToSell = authUser.transactions.id(id);
+
+
+      if(ticker !== transactionToSell.ticker) res.status(200).json({ ok: false, msg: "Cannot sell different coin" });
+      if(type !== "sell") res.status(200).json({ ok: false, msg: "Incorrect type for selling" });
+      if(quantity > transactionToSell.quantity) res.status(200).json({ ok: false, msg: "Cannot sell more than position amount" });
+
+
+
+      // two scenarios
+      // 1. sellingQuantity is part of quantity
+      // 2. sellingQuantity is equal to quantity
+
+      if(transactionToSell.quantity - quantity !== 0) {
+
+        transactionToSell.set({
+          ...transactionToSell,
+          quantity: transactionToSell.quantity - quantity,
+        });
+
+      } else if (transactionToSell.quantity - quantity === 0) {
+
+        transactionToSell.set({
+          ...transactionToSell,
+          quantity: transactionToSell.quantity - quantity,
+          open: false,
+        });
+      }
+
+
+      // transaction edited
+      // create history item based on transaction
+
+
+      const sellHistoryItem = {
+        ticker: ticker,
+        type: type,
+        entryPrice: transactionToSell.entryPrice,
+        sellingPrice: price,
+        quantity: transactionToSell.quantity,
+        sellingQuantity: quantity,
+        openDate: date,
+        closeDate: new Date(),
+        gain: (quantity * price),
+        invested: transactionToSell.quantity * transactionToSell.entryPrice
+      }
+
+      const newSellHistoryItem = await this.historyModel.create(sellHistoryItem);
+      authUser.history.push(newSellHistoryItem);
+
+
+      await authUser.save();
+
+
+      res.status(200).json({ ok: true, msg: "Transaction sold" });
+
+
+      
+    } catch (error) {
+      console.log('Error selling transaction');
+      console.log(error.message);
+      res.status(500).json({ ok: false, msg: "Something went wrong"})
+    }
+  }
+
+
   async average(res: Response, user: UserDocument) {
 
     try {

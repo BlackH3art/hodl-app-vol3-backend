@@ -70,4 +70,15 @@ export class TransactionController {
   ): Promise<any> {
     return this.transactionService.edit(transactionBody, id, res, user);
   }
+
+  @Patch('sell/:id')
+  @UseGuards(AuthGuard('jwt'))
+  sellTransaction(
+    @Param('id') id: string,
+    @Body() transactionBody: TransactionBodyInterface,
+    @UserDecorator() user: UserDocument,
+    @Res() res: Response
+  ): Promise<any> {
+    return this.transactionService.sell(transactionBody, id, res, user);
+  }
 }
