@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
@@ -92,7 +92,12 @@ export class FetchCmcService {
     } catch (error) {
       console.log("error fetching single coin");
       console.log(error.message);
-      res.status(500).json({ ok: false, msg: "Something went wrong"});
+
+      if(error.response.status === 400) {
+        res.status(400).json({ ok: false, msg: "Coin not found"});
+      } else {
+        res.status(500).json({ ok: false, msg: "Something went wrong"});
+      }
     }
     
   }

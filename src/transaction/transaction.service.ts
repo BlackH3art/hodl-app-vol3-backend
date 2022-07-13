@@ -495,8 +495,11 @@ export class TransactionService {
         }
       ]);
 
-
-      res.status(200).json({ ok: true, msg: "Ticker max amount", data: tickerMaxAmount})
+      if(tickerMaxAmount.length === 0) {
+        res.status(200).json({ ok: false, msg: "You have no such coin"});
+      } else {
+        res.status(200).json({ ok: true, msg: "Ticker max amount", data: tickerMaxAmount})
+      }
 
       
     } catch (error) {
