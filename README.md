@@ -16,13 +16,13 @@ https://github.com/BlackH3art/hodl-app-vol3-frontend
 ## About
 
 This application is meant to help crypto traders manage their portfolio, as well as opened positions and transactions history.\
-It tracks current price of given crypto asset based on https://coinmarketcap.com/ API.\
+It tracks current price of given crypto asset based on https://coinmarketcap.com/ API.
 
 **hoDl! app** consists of three segments:
 - Positions
 - Wallet
 - History
-\
+
 
 ### Positions
 Where you can track current price and state for each and every buy transaction u made.\
@@ -32,7 +32,7 @@ Application calculates:
 - your total investment
 - how much is it currently worth
 - amount of crypto
-\
+
 
 ### Wallet
 Wallet aggregates your multiple positions, in case if you are interested in DCA (dolar cost average) strategies.\
@@ -43,7 +43,7 @@ Application calculates:
 - your total investment
 - how much is it currently worth
 - atotal mount of crypto
-\
+
 
 ### History
 Keeps track of your each transaction buying, selling\
