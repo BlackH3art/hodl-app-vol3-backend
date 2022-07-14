@@ -1,73 +1,103 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# hoDl! app
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+![](https://github.com/BlackH3art/hodl-app-vol3-backend/blob/main/src/images/thumbnail.jpg "thumbnail")
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Application is deployed on heroku: \
+https://hodlapp-vol3.herokuapp.com/
 
-## Description
+It serves as a REST API for React application deployed on:\
+https://www.hodl-app.xyz
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Frontend repository:\
+https://github.com/BlackH3art/hodl-app-vol3-frontend
 
-## Installation
+-----
 
-```bash
-$ npm install
+## About
+
+This application is meant to help crypto traders manage their portfolio, as well as opened positions and transactions history.\
+It tracks current price of given crypto asset based on https://coinmarketcap.com/ API.\
+
+**hoDl! app** consists of three segments:
+- Positions
+- Wallet
+- History
+\
+
+### Positions
+Where you can track current price and state for each and every buy transaction u made.\
+Application calculates:
+- percent PNL
+- dolar PNL
+- your total investment
+- how much is it currently worth
+- amount of crypto
+\
+
+### Wallet
+Wallet aggregates your multiple positions, in case if you are interested in DCA (dolar cost average) strategies.\
+Application calculates:
+- average price you bought each and every crypto
+- total percent PNL
+- total dolar PNL
+- your total investment
+- how much is it currently worth
+- atotal mount of crypto
+\
+
+### History
+Keeps track of your each transaction buying, selling\
+Stored data:
+- date when position was opened
+- date when positions was closed,
+- dolar PNL from selling transactions
+- amount of crypto bought and sold
+
+-----
+
+## Try this app:
+To try this app:
+- go to https://www.hodl-app.xyz
+- create your account
+- add first transaction filling up the form
+
+`Ticker` - is the cryptocurrency symbol (e.g BTC)\
+`Amount` - what is the amount of crypto you bought (e.g 2 for 2BTC)\
+`Price` - what is the price that you bought it for.\
+Example:
+
+You bought two Bitcoins at the price of 15000$\
+Application will calculate that you know have 2BTC and they are worth 30000$\
+
+### Access
+Application is restricted to two domains:
+```javascript
+  app.enableCors({
+    origin: ['https://hodl-app.xyz', 'https://www.hodl-app.xyz'],
+    credentials: true
+  });
+```
+So you won't be able to test endpoints, but you can clone this repository with:
+```
+git clone https://github.com/BlackH3art/hodl-app-vol3-backend.git
+```
+\
+Fill your `.env` file:\
+`CONNECTION_URL` - MongoDB Connection rul\
+`CMC_API_KEY` - coin market cap API key\
+`SECRET_STRING` - some secret long string\
+`SALT` - some secret long string\
+`SECRET` - some secret long string\
+
+Then:
+```
+npm install
+```
+Then:
+```
+nest start --watch
 ```
 
-## Running the app
 
-```bash
-# development
-$ npm run start
+----
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
