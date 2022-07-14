@@ -46,6 +46,7 @@ export class AuthService {
       await authUser.save();
       
     } catch (error) {
+      console.log('Error generateToken');
       console.log(error.message);
     }
 
@@ -78,16 +79,17 @@ export class AuthService {
       }
 
       res.status(200).cookie('jwt', token.accessToken, {
-        secure: false,
-        domain: "localhost",
+        secure: true,
+        domain: "hodl-app",
         httpOnly: true,
       });
 
       return res.json(userResponse);
       
     } catch (error) {
+      console.log("Error login");
       console.log(error.message);
-      res.status(500).json({ msg: "Server error" })
+      res.status(500).json({ msg: "Server error" });
     }
   }
 
