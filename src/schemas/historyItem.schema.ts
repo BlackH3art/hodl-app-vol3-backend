@@ -36,6 +36,9 @@ export class HistoryItem extends Document {
   @Prop({ type: Date })
   openDate: Date;
 
+  @Prop({ type: Date })
+  createdAt: Date;
+
 }
 
 export const HistoryItemSchema = SchemaFactory.createForClass(HistoryItem);

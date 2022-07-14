@@ -8,6 +8,7 @@ import { TransactionBodyInterface } from 'src/interfaces/TransactionInterface';
 import { HistoryItem } from 'src/schemas/historyItem.schema';
 import { TransactionDocument, TransactionItem } from 'src/schemas/transactionItem.schema';
 import { User, UserDocument } from 'src/schemas/user.schema';
+import { ErrorTransactionBody } from 'src/interfaces/ErrorTransactionBody';
 
 @Injectable()
 export class TransactionService {
@@ -20,8 +21,28 @@ export class TransactionService {
   ) {}
 
 
+  private validateTransactionBody(transactionBody: TransactionBodyInterface) {
+
+    const error: ErrorTransactionBody = {
+      ticker: "",
+      quantity: "",
+      price: ""
+    }
+
+    if(transactionBody.ticker === "") error.ticker = "Ticker cannot be empty";
+    if(Number(transactionBody.quantity) <= 0) error.quantity = "Amount cannot be negative or zero";
+    if(Number(transactionBody.price) <= 0) error.price = "Price cannot be negative or zero";
+
+    return error;
+  }
+
+
   async add(transactionBody: TransactionBodyInterface, res: Response, user: UserDocument) {
 
+    const isError: ErrorTransactionBody = this.validateTransactionBody(transactionBody);
+    if(isError.price !== "" || isError.quantity !== "" || isError.price !== "") {
+      res.status(200).json({ ok: false, msg: "Validation error", data: isError });
+    }
     
     try {
 
@@ -36,6 +57,7 @@ export class TransactionService {
 
           try {
             const buyHistoryItem = {
+              createdAt: new Date(),
               ticker: ticker,
               type: type,
               entryPrice: price,
@@ -131,6 +153,7 @@ export class TransactionService {
                 });
   
                 const sellHistoryItem = {
+                  createdAt: new Date(),
                   ticker: ticker,
                   type: type,
                   entryPrice: transaction.entryPrice,
@@ -251,6 +274,11 @@ export class TransactionService {
 
   async edit(transactionBody: TransactionBodyInterface, id: string, res: Response, user: UserDocument) {
     
+    const isError: ErrorTransactionBody = this.validateTransactionBody(transactionBody);
+    if(isError.price !== "" || isError.quantity !== "" || isError.price !== "") {
+      res.status(200).json({ ok: false, msg: "Validation error", data: isError });
+    }
+
     try {
 
       const { ticker, type, quantity, price, date } = transactionBody;
@@ -297,6 +325,11 @@ export class TransactionService {
 
   async sell(transactionBody: TransactionBodyInterface, id: string, res: Response, user: UserDocument) {
 
+    const isError: ErrorTransactionBody = this.validateTransactionBody(transactionBody);
+    if(isError.price !== "" || isError.quantity !== "" || isError.price !== "") {
+      res.status(200).json({ ok: false, msg: "Validation error", data: isError });
+    }
+    
     try {
 
       const { ticker, type, quantity, price, date } = transactionBody;
@@ -313,6 +346,27 @@ export class TransactionService {
       if(ticker !== transactionToSell.ticker) return res.status(200).json({ ok: false, msg: "Cannot sell different coin" });
       if(type !== "sell") return res.status(200).json({ ok: false, msg: "Incorrect type for selling" });
       if(quantity > transactionToSell.quantity) return res.status(200).json({ ok: false, msg: "Cannot sell more than position amount" });
+
+
+
+
+      const sellHistoryItem = {
+        createdAt: new Date(),
+        ticker: ticker,
+        type: type,
+        entryPrice: transactionToSell.entryPrice,
+        sellingPrice: price,
+        quantity: transactionToSell.quantity,
+        sellingQuantity: quantity,
+        openDate: date,
+        closeDate: new Date(),
+        gain: (quantity * price) - (transactionToSell.quantity * transactionToSell.entryPrice),
+        invested: transactionToSell.quantity * transactionToSell.entryPrice
+      }
+      
+      const newSellHistoryItem = await this.historyModel.create(sellHistoryItem);
+      authUser.history.push(newSellHistoryItem);
+      
 
 
       if(transactionToSell.quantity - quantity !== 0) {
@@ -332,21 +386,7 @@ export class TransactionService {
       }
 
 
-      const sellHistoryItem = {
-        ticker: ticker,
-        type: type,
-        entryPrice: transactionToSell.entryPrice,
-        sellingPrice: price,
-        quantity: transactionToSell.quantity,
-        sellingQuantity: quantity,
-        openDate: date,
-        closeDate: new Date(),
-        gain: (quantity * price),
-        invested: transactionToSell.quantity * transactionToSell.entryPrice
-      }
 
-      const newSellHistoryItem = await this.historyModel.create(sellHistoryItem);
-      authUser.history.push(newSellHistoryItem);
 
 
       await authUser.save();
@@ -387,13 +427,32 @@ export class TransactionService {
           }
         }, 
         {
+          $project: {
+            invested: {
+              $multiply: ["$transactions.quantity", "$transactions.entryPrice"]
+            },
+            ticker: "$transactions.ticker",
+            quantity: "$transactions.quantity",
+            entryPrice: "$transactions.entryPrice",
+          }
+        },
+        {
           $group: {
-            _id: '$transactions.ticker', 
-            averagePrice: {
-              $avg: '$transactions.entryPrice'
-            }, 
-            quantitySum: {
-              $sum: '$transactions.quantity'
+            _id: "$ticker",
+            totalInvested: {
+              $sum: "$invested"
+            },
+            totalQuantity: {
+              $sum: "$quantity"
+            },
+          }
+        },
+        {
+          $project: {
+            totalInvested: 1,
+            totalQuantity: 1,
+            avgPrice: {
+              $divide: ["$totalInvested", "$totalQuantity"]
             }
           }
         }
