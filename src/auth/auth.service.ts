@@ -86,6 +86,9 @@ export class AuthService {
 
       res.status(200).cookie('jwt', token.accessToken);
 
+      console.log('response --> ', res);
+      
+
       return res.json(userResponse);
       
     } catch (error) {
