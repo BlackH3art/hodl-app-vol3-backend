@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: ['https://hodl-app.xyz', 'https://www.hodl-app.xyz'],
+    // origin: ['https://hodl-app.xyz', 'https://www.hodl-app.xyz', 'http://localhost:3000'],
     credentials: true
   });
 
