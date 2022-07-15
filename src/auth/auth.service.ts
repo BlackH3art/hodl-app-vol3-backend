@@ -80,7 +80,7 @@ export class AuthService {
 
       res.status(200).cookie('jwt', token.accessToken, {
         secure: true,
-        domain: "hodl-app",
+        domain: "hodl-app.xyz",
         httpOnly: true,
       });
 
