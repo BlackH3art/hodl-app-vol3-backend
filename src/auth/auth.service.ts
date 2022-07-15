@@ -79,10 +79,10 @@ export class AuthService {
       }
 
       res.status(200).cookie('jwt', token.accessToken, {
-        // secure: true,
-        // domain: "www.hodl-app.xyz",
+        secure: true,
+        domain: "hodl-app.xyz",
         httpOnly: true,
-        sameSite: false,
+        sameSite: "none",
       });
 
       // res.status(200).cookie('jwt', token.accessToken);
