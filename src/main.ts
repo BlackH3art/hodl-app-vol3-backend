@@ -10,7 +10,8 @@ async function bootstrap() {
   app.set("trust proxy", 1);
 
   app.enableCors({
-    origin: ['https://hodl-app.xyz', 'https://www.hodl-app.xyz', 'http://hodl-app.xyz', 'http://www.hodl-app-xyz'],
+    // origin: ['https://hodl-app.xyz', 'https://www.hodl-app.xyz', 'http://hodl-app.xyz', 'http://www.hodl-app-xyz'],
+    origin: "http://localhost:3000",
     credentials: true
   });
 

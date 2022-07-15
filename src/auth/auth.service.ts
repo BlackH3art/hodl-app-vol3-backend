@@ -78,19 +78,19 @@ export class AuthService {
         currentToken: authUser.currentToken,
       }
 
-      res.status(200).cookie('jwt', token.accessToken, {
-        secure: true,
-        domain: "hodl-app.xyz",
-        httpOnly: true,
-        sameSite: "none",
-      });
+      // res.status(200).cookie('jwt', token.accessToken, {
+      //   secure: false,
+      //   domain: "localhost",
+      //   httpOnly: true,
+      //   // sameSite: "none",
+      // });
 
       // res.status(200).cookie('jwt', token.accessToken);
 
-      console.log('response --> ', res);
+      // console.log('response --> ', res);
       
 
-      return res.json(userResponse);
+      return res.status(200).json({ user: userResponse, token: token.accessToken});
       
     } catch (error) {
       console.log("Error login");
