@@ -67,7 +67,7 @@ To try this app:
 Example:
 
 You bought two Bitcoins at the price of 15000$\
-Application will calculate that you know have 2BTC and they are worth 30000$\
+Application will calculate that you now have 2BTC and they are worth 30000$\
 
 ### Access
 Application is restricted to two domains:
